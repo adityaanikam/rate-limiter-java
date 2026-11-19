@@ -84,9 +84,9 @@ Because the channel blocks us when we go over, I picked the option that never ex
 
 * single thread behaviour: the limit, a limit of one, an invalid limit, the full window resetting, and slots freeing one by one as old calls leave the window;
 * **100 threads making 10,000 calls at the same moment** with a frozen clock: exactly `N` succeed, never more. This is repeated across window changes;
-* a test with the real clock, 32 threads for 1.2 seconds, checking that no more than two windows worth pass.
+* a real clock test with 32 threads running for 1.2 seconds. Each thread records the time its own call was judged at. The test then sorts all the allowed calls and checks that no one second span contains more than `N` of them. This is a check on the real clock and real thread timing, next to the exact tests above.
 
-The clock is a constructor argument, so the tests that depend on time use a fake clock and do not sleep.
+The clock is passed in through a `LongSupplier`, so the tests that depend on time use a fake clock that they move by hand. This makes the boundary cases exact and means no test sleeps. The normal constructor uses `System.nanoTime()`. A custom clock must be monotonic, as `System.nanoTime()` is.
 
 ## What I was unsure about
 
